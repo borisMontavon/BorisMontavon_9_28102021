@@ -12,4 +12,5 @@ class Firestore {
   bill = bid => this.store.doc(`bills/${bid}`)
   bills = () => this.store.collection('bills')
 }
+
 export default new Firestore()

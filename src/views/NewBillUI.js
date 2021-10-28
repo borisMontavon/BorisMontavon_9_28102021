@@ -1,7 +1,6 @@
 import VerticalLayout from './VerticalLayout.js'
 
 export default () => {
-
   return (`
     <div class='layout'>
       ${VerticalLayout(120)}
@@ -70,5 +69,5 @@ export default () => {
         </div>
       </div>
     </div>
-  `)
+  `);
 }
