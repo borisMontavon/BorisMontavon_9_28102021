@@ -16,14 +16,24 @@ export const filteredBills = (data, status) => {
         selectCondition = (bill.status === status)
       } else {
         // in prod environment
-        const userEmail = JSON.parse(localStorage.getItem("user")).email
-        selectCondition =
-          (bill.status === status) &&
-          [...USERS_TEST, userEmail].includes(bill.email)
+        const userEmail = JSON.parse(localStorage.getItem("user")).email;
+        const validDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/;
+
+        selectCondition = (bill.status === status) && [...USERS_TEST, userEmail].includes(bill.email) && validDate.test(bill.date) && !Number.isNaN(bill.amount);
       }
 
       return selectCondition
     }) : []
+}
+
+export const orderBills = (bills) => {
+  return bills.sort((a, b) => {
+    if (new Date(b.date) > new Date(a.date)) {
+      return 1;
+    }
+
+    return -1;
+  });
 }
 
 export const card = (bill) => {
@@ -52,6 +62,9 @@ export const card = (bill) => {
 }
 
 export const cards = (bills) => {
+  bills.forEach((bill) => {
+    console.log(bill.date);
+  })
   return bills && bills.length ? bills.map(bill => card(bill)).join("") : ""
 }
 
@@ -136,7 +149,7 @@ export default class {
     if (this.counter % 2 === 0) {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${this.index}`)
-        .html(cards(filteredBills(bills, getStatus(this.index))))
+        .html(cards(orderBills(filteredBills(bills, getStatus(this.index)))))
       this.counter ++
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
