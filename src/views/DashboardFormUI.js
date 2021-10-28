@@ -19,10 +19,9 @@ export const modal = () => (`
       </div>
     </div>
   </div>
-  `)
+`)
 
 export default (bill) => {
-
   return (`
     <div class="container dashboard-form" data-testid="dashboard-form">
       <div class="row">
@@ -98,5 +97,5 @@ export default (bill) => {
     </div>
     ${modal()}
     </div>
-  `)
+  `);
 }
