@@ -23,17 +23,35 @@ export default class NewBill {
   }
 
   handleChangeFile = e => {
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0];
+    const inputFile = this.document.querySelector(`input[data-testid="file"]`);
+    const file = this.document.querySelector(`input[data-testid="file"]`).value;
+    const uploadedFile = this.document.querySelector(`input[data-testid="file"]`).files[0];
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length-1];
-  
-    this.firestore.storage.ref(`justificatifs/${fileName}`)
-      .put(file)
-      .then(snapshot => snapshot.ref.getDownloadURL())
-      .then(url => {
-        this.fileUrl = url;
-        this.fileName = fileName;
-      });
+    const errorSpan = this.document.getElementById("wrong-uploaded-file");
+
+    if (file != "") {
+      const extension = file.substring(file.lastIndexOf(".") + 1).toLowerCase();
+
+      if (extension === "jpg" || extension === "jpeg" || extension === "png") {
+        errorSpan.style.display = "none";
+        this.firestore.storage.ref(`justificatifs/${fileName}`)
+          .put(uploadedFile)
+          .then(snapshot => snapshot.ref.getDownloadURL())
+          .then(url => {
+            this.fileUrl = url;
+            this.fileName = fileName;
+          });
+        
+        return true;
+      } else {
+        inputFile.type = "";
+        inputFile.type = "file";
+        errorSpan.style.display = "block";
+
+        return false;
+      }
+    }
   }
 
   handleSubmit = e => {

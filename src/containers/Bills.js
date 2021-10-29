@@ -37,6 +37,16 @@ export default class {
     $('#modaleFile').modal('show');
   }
 
+  orderBills = (bills) => {
+    return bills.sort((a, b) => {
+      if (new Date(b.date) > new Date(a.date)) {
+        return 1;
+      }
+  
+      return -1;
+    });
+  }
+
   // not need to cover this function by tests
   getBills = () => {
     const userEmail = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).email : "";
@@ -45,11 +55,16 @@ export default class {
       return this.firestore.bills().get().then(snapshot => {
         const bills = snapshot.docs.map(doc => {
             try {
-              return {
-                ...doc.data(),
-                date: formatDate(doc.data().date),
-                status: formatStatus(doc.data().status)
-              };
+              // const validDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/;
+
+              // if (validDate.test(doc.data().date)) {
+                console.log(doc.data().date);
+                return {
+                  ...doc.data(),
+                  date: doc.data().date,
+                  status: formatStatus(doc.data().status)
+                };
+              // }
             } catch(e) {
               // if for some reason, corrupted data was introduced, we manage here failing formatDate function
               // log the error and return unformatted date in that case
@@ -64,8 +79,17 @@ export default class {
         }).filter(bill => bill.email === userEmail);
 
         console.log('length', bills.length);
-        
-        return bills;
+        console.log(bills);
+
+        const sortedBills = this.orderBills(bills);
+
+        sortedBills.forEach((bill) => {
+          bill.date = formatDate(bill.date);
+        });
+
+        console.log(sortedBills);
+
+        return sortedBills;
       }).catch(error => error)
     }
   }
