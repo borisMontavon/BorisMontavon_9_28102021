@@ -28,6 +28,6 @@ export const formatStatus = (status) => {
     case "accepted":
       return "Accepté"
     case "refused":
-      return "Refused"
+      return "Refusé"
   }
 }

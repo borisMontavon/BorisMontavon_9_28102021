@@ -109,3 +109,9 @@ tr td:nth-of-type(5) {
   font-weight: 500;
   color: #0E5AE5;
 }
+
+#wrong-uploaded-file {
+  color: #D62828;
+  display: none;
+  font-size: 0.9rem;
+}
