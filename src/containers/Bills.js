@@ -37,60 +37,45 @@ export default class {
     $('#modaleFile').modal('show');
   }
 
-  orderBills = (bills) => {
-    return bills.sort((a, b) => {
-      if (new Date(b.date) > new Date(a.date)) {
-        return 1;
-      }
-  
-      return -1;
-    });
-  }
-
   // not need to cover this function by tests
   getBills = () => {
     const userEmail = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).email : "";
 
     if (this.firestore) {
       return this.firestore.bills().get().then(snapshot => {
-        const bills = snapshot.docs.map(doc => {
-            try {
-              // const validDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/;
+        const bills = snapshot.docs.map(doc => this.getBill(doc)).filter(bill => bill.email === userEmail);
 
-              // if (validDate.test(doc.data().date)) {
-                console.log(doc.data().date);
-                return {
-                  ...doc.data(),
-                  date: doc.data().date,
-                  status: formatStatus(doc.data().status)
-                };
-              // }
-            } catch(e) {
-              // if for some reason, corrupted data was introduced, we manage here failing formatDate function
-              // log the error and return unformatted date in that case
-              console.log(e,'for', doc.data());
+        // console.log('length', bills.length);
 
-              return {
-                ...doc.data(),
-                date: doc.data().date,
-                status: formatStatus(doc.data().status)
-              }
-            }
-        }).filter(bill => bill.email === userEmail);
-
-        console.log('length', bills.length);
-        console.log(bills);
-
-        const sortedBills = this.orderBills(bills);
-
-        sortedBills.forEach((bill) => {
-          bill.date = formatDate(bill.date);
-        });
-
-        console.log(sortedBills);
-
-        return sortedBills;
+        return bills;
       }).catch(error => error)
     }
+  }
+
+  getBill = (doc) => {
+    const date = doc.data().date;
+
+    try {
+      const validDate = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+
+      if (validDate.test(date)) {
+        return {
+          ...doc.data(),
+          date: date,
+          formatedDate: formatDate(date),
+          status: formatStatus(doc.data().status)
+        };
+      }
+    } catch(e) {
+      // if for some reason, corrupted data was introduced, we manage here failing formatDate function
+      // log the error and return unformatted date in that case
+      console.log(e,'for', doc.data());
+    }
+
+    return {
+      ...doc.data(),
+      date: date,
+      status: formatStatus(doc.data().status)
+    };
   }
 }

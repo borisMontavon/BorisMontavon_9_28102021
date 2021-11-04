@@ -4,6 +4,7 @@ import LoadingPage from "./LoadingPage.js"
 import Actions from './Actions.js'
 
 const row = (bill) => {
+  // console.log(bill);
   return (`
     <tr>
       <td>${bill.type}</td>
@@ -44,6 +45,16 @@ export default ({ data: bills, loading, error }) => {
     return LoadingPage();
   } else if (error) {
     return ErrorPage(error);
+  }
+
+  if (bills) {
+    bills.sort((a, b) => {
+      if (new Date(b.date) > new Date(a.date)) {
+        return 1;
+      }
+  
+      return -1;
+    });
   }
   
   return (`

@@ -105,8 +105,6 @@ export default class {
       this.index = index;
     }
 
-    console.log(this.displayedGroupOfTickets[this.index - 1]);
-
     if (!this.displayedGroupOfTickets[this.index - 1]) {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'});
       $(`#status-bills-container${this.index}`).html(cards(orderBills(filteredBills(bills, getStatus(this.index))), this.id));
