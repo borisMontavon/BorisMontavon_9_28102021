@@ -24,10 +24,12 @@ export const formatDate = (dateStr) => {
 export const formatStatus = (status) => {
   switch (status) {
     case "pending":
-      return "En attente"
+      return "En attente";
     case "accepted":
       return "Accepté"
     case "refused":
       return "Refusé"
+    default:
+      throw new Error("status not supported");
   }
 }

@@ -10,11 +10,15 @@ export default class NewBill {
 
     const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`);
     
-    formNewBill.addEventListener("submit", this.handleSubmit);
+    if (formNewBill) {
+      formNewBill.addEventListener("submit", this.handleSubmit);
+    }
     
     const file = this.document.querySelector(`input[data-testid="file"]`);
     
-    file.addEventListener("change", this.handleChangeFile);
+    if (file) {
+      file.addEventListener("change", this.handleChangeFile);
+    }
     
     this.fileUrl = null;
     this.fileName = null;
@@ -57,7 +61,7 @@ export default class NewBill {
   handleSubmit = e => {
     e.preventDefault();
 
-    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
+    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value);
     
     const email = JSON.parse(localStorage.getItem("user")).email;
     const bill = {
@@ -74,20 +78,15 @@ export default class NewBill {
       status: 'pending'
     };
 
-    this.createBill(bill);
-    this.onNavigate(ROUTES_PATH['Bills']);
+    await this.createBill(bill);
   }
 
   // not need to cover this function by tests
   createBill = (bill) => {
     if (this.firestore) {
-      this.firestore
-      .bills()
-      .add(bill)
-      .then(() => {
+      return this.firestore.bills().add(bill).then(() => {
         this.onNavigate(ROUTES_PATH['Bills'])
-      })
-      .catch(error => error)
+      }).catch(error => error)
     }
   }
 }
