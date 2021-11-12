@@ -21,7 +21,8 @@
     "bootstrap": "^4.0.0",
     "express": "^4.17.1",
     "jquery": "^3.5.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "popper.js": "^1.12.9"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.10.4",
