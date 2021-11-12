@@ -9,7 +9,7 @@ export default class {
     this.firestore = firestore;
 
     const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`);
-    
+
     if (buttonNewBill) {
       buttonNewBill.addEventListener('click', this.handleClickNewBill);
     }
@@ -45,8 +45,6 @@ export default class {
       return this.firestore.bills().get().then(snapshot => {
         const bills = snapshot.docs.map(doc => this.getBill(doc)).filter(bill => bill.email === userEmail);
 
-        // console.log('length', bills.length);
-
         return bills;
       }).catch(error => error)
     }
@@ -75,7 +73,7 @@ export default class {
     return {
       ...doc.data(),
       date: date,
-      status: formatStatus(doc.data().status)
+      status: doc.data().status
     };
   }
 }

@@ -207,10 +207,10 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
 describe("Given I am a user connected as Admin", () => {
   describe("When I navigate to Dashboard", () => {
     test("fetches bills from mock API GET", async () => {
-       const getSpy = jest.spyOn(firebase, "get")
-       const bills = await firebase.get()
-       expect(getSpy).toHaveBeenCalledTimes(1)
-       expect(bills.data.length).toBe(4)
+      const getSpy = jest.spyOn(firebase, "get")
+      const bills = await firebase.get()
+      expect(getSpy).toHaveBeenCalledTimes(1)
+      expect(bills.data.length).toBe(4)
     })
     test("fetches bills from an API and fails with 404 message error", async () => {
       firebase.get.mockImplementationOnce(() =>
