@@ -69,6 +69,12 @@ describe("Given I am connected as an employee", () => {
       new Bills({document, undefined, undefined, localStorage});
 
       iconEye[0].click();
+
+      const modal = document.getElementById("modaleFile");
+
+      setTimeout(() => {
+        expect(modal.className).toEqual("modal fade show");
+      }, 2000);
     })
     test("Getting a bill data", () => {
       const bill = new Bills({document, undefined, undefined, localStorage});

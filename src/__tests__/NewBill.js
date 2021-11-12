@@ -5,10 +5,41 @@ import firebase from "../__mocks__/firebase";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
-    test("Then ...", () => {
-      const html = NewBillUI()
-      document.body.innerHTML = html
-      //to-do write assertion
+    test("Then I upload a new file", async () => {
+      const html = NewBillUI();
+      document.body.innerHTML = html;
+
+      const newBill = new NewBill({document, undefined, firestore: firebase, undefined});
+
+      const result1 = await newBill.handleChangeFile({ target: { value: "test\\test.jpg"}});
+      const result2 = await newBill.handleChangeFile({ target: { value: "test\\test.jpeg"}});
+      const result3 = await newBill.handleChangeFile({ target: { value: "test\\test.png"}});
+      const result4 = await newBill.handleChangeFile({ target: { value: "test\\test"}});
+      const result5 = await newBill.handleChangeFile({ target: { value: ""}});
+
+      expect(result1).toBeTruthy();
+      expect(result2).toBeTruthy();
+      expect(result3).toBeTruthy();
+      expect(result4).toBeFalsy();
+      expect(result5).toBeFalsy();
+    })
+    test("Then I create a new bill", () => {
+      const html = NewBillUI();
+      document.body.innerHTML = html;
+
+      localStorage.setItem("user", `{"type":"Employee","email":"noobnoob@yopmail.com","password":"1234","status":"connected"}`);
+
+      let currentPage = "";
+      let onNavigate = function(path) {
+        currentPage = path;
+        
+        expect(currentPage).toEqual("#employee/bills");
+      };
+
+      new NewBill({document, onNavigate, firestore: firebase, localStorage});
+      const formNewBill = document.querySelector(`form[data-testid="form-new-bill"]`);
+
+      formNewBill.submit();
     })
   })
 })

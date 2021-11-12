@@ -26,9 +26,9 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate });
   }
 
-  handleChangeFile = e => {
+  handleChangeFile = async (e) => {
     const inputFile = this.document.querySelector(`input[data-testid="file"]`);
-    const file = this.document.querySelector(`input[data-testid="file"]`).value;
+    const file = e.target.value;
     const uploadedFile = this.document.querySelector(`input[data-testid="file"]`).files[0];
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length-1];
@@ -52,13 +52,13 @@ export default class NewBill {
         inputFile.type = "";
         inputFile.type = "file";
         errorSpan.style.display = "block";
-
-        return false;
       }
     }
+
+    return false;
   }
 
-  handleSubmit = e => {
+  handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value);
