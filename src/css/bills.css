@@ -115,3 +115,7 @@ tr td:nth-of-type(5) {
   display: none;
   font-size: 0.9rem;
 }
+
+.modal-body img {
+  max-width: calc(800px - 2rem);
+}
