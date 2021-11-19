@@ -117,3 +117,6 @@
   cursor: pointer;
 }
 
+.modal-body img {
+  max-width: calc(800px - 2rem);
+}
