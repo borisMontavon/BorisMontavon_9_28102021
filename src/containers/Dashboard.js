@@ -4,6 +4,7 @@ import BigBilledIcon from '../assets/svg/big_billed.js'
 import { ROUTES_PATH } from '../constants/routes.js'
 import USERS_TEST from '../constants/usersTest.js'
 import Logout from "./Logout.js"
+import { getBillsAllUsers, updateBill } from './FirestoreCaller.js'
 
 export const filteredBills = (data, status) => {
   return (data && data.length) ? data.filter(bill => {
@@ -84,7 +85,7 @@ export default class {
     $('#arrow-icon2').on("click", ((e) => this.handleShowTickets(e, bills, 2)));
     $('#arrow-icon3').on("click", ((e) => this.handleShowTickets(e, bills, 3)));
     
-    this.getBillsAllUsers();
+    getBillsAllUsers(this.firestore);
     
     new Logout({ localStorage, onNavigate });
   }
@@ -96,6 +97,8 @@ export default class {
 
     if (typeof $('#modaleFileAdmin1').modal === 'function') {
       $('#modaleFileAdmin1').modal('show');
+    } else {
+      throw new Error("Modal function cannot be undefined");
     }
   }
 
@@ -137,6 +140,10 @@ export default class {
       $('.dashboard-right-container div').html(DashboardFormUI(bill));
       $('.vertical-navbar').css({ height: '150vh' });
       this.displayTicket = false;
+
+      $('#icon-eye-d').on("click", (this.handleClickIconEye));
+      $('#btn-accept-bill').on("click", (e) => this.handleAcceptSubmit(e, bill));
+      $('#btn-refuse-bill').on("click", (e) => this.handleRefuseSubmit(e, bill));
     } else {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' });
       $('.dashboard-right-container div').html(`
@@ -146,10 +153,6 @@ export default class {
       this.displayTicket = true;
       this.id = undefined;
     }
-
-    $('#icon-eye-d').on("click", (this.handleClickIconEye));
-    $('#btn-accept-bill').on("click", (e) => this.handleAcceptSubmit(e, bill));
-    $('#btn-refuse-bill').on("click", (e) => this.handleRefuseSubmit(e, bill));
   }
 
   handleAcceptSubmit = (e, bill) => {
@@ -159,7 +162,7 @@ export default class {
       commentAdmin: $('#commentary2').val()
     };
 
-    this.updateBill(newBill);
+    updateBill(this.firestore, newBill);
     this.onNavigate(ROUTES_PATH['Dashboard']);
   }
 
@@ -170,38 +173,7 @@ export default class {
       commentAdmin: $('#commentary2').val()
     };
 
-    this.updateBill(newBill);
+    updateBill(this.firestore, newBill);
     this.onNavigate(ROUTES_PATH['Dashboard']);
-  }
-
-  // not need to cover this function by tests
-  getBillsAllUsers = () => {
-    if (this.firestore) {
-      return this.firestore
-      .bills()
-      .get()
-      .then(snapshot => {
-        const bills = snapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          date: doc.data().date,
-          status: doc.data().status
-        }))
-        return bills
-      })
-      .catch(console.log)
-    }
-  }
-    
-  // not need to cover this function by tests
-  updateBill = (bill) => {
-    if (this.firestore) {
-    return this.firestore
-      .bill(bill.id)
-      .update(bill)
-      .then(bill => bill)
-      .catch(console.log)
-    }
   }
 }

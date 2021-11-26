@@ -92,7 +92,21 @@ export default {
         });
       },
       add: function(bill) {
+        if (checkRejectBill(bill)) {
+          return Promise.reject(new Error("Erreur 404"));
+        }
         return Promise.resolve();
+      }
+    }
+  },
+
+  bill: (id) => {
+    return {
+      update: function(bill) {
+        if (checkRejectBill(id)) {
+          return Promise.reject(new Error("Erreur 500"));
+        }
+        return Promise.resolve({id, amount: 100});
       }
     }
   },
@@ -111,5 +125,46 @@ export default {
         }
       }
     }
+  },
+
+  user: (email) => {
+    const exists = checkTestUser(email);
+    const rejects = checkRejectUser(email);
+
+    return {
+      get: function() {
+        if (rejects) {
+          return Promise.reject(new Error("Error when checking user"));
+        }
+
+        return Promise.resolve({
+          exists: exists
+        });
+      }
+    }
+  },
+
+  users: () => {
+    return {
+      doc: function(email) {
+        return {
+          set: function(obj) {
+            return Promise.resolve();
+          }
+        }
+      }
+    }
   }
+}
+
+const checkRejectBill = (bill) => {
+  return bill === "reject";
+}
+
+const checkTestUser = (email) => {
+  return email === "test";
+}
+
+const checkRejectUser = (email) => {
+  return email === "reject";
 }

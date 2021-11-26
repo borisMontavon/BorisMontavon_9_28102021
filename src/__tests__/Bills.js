@@ -3,6 +3,7 @@ import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
 import Bills from "../containers/Bills.js";
 import firebase from "../__mocks__/firebase";
+import { getBill, getBills } from "../containers/FirestoreCaller.js";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -76,9 +77,31 @@ describe("Given I am connected as an employee", () => {
         expect(modal.className).toEqual("modal fade show");
       }, 2000);
     })
-    test("Getting a bill data", () => {
-      const bill = new Bills({document, undefined, undefined, localStorage});
+    test("HTML without button New bill", () => {
+      let error = "";
+      document.body.innerHTML = "";
 
+      try {
+        new Bills({document, undefined, undefined, localStorage});
+      } catch (err) {
+        error = err.message;
+      }
+
+      expect(error).toEqual("Button new bill cannot be null or undefined");
+    })
+    test("HTML without icon eye", () => {
+      let error = "";
+      document.body.innerHTML = '<button type="button" data-testid="btn-new-bill" class="btn btn-primary">Nouvelle note de frais</button>';
+
+      try {
+        new Bills({document, undefined, undefined, localStorage});
+      } catch (err) {
+        error = err.message;
+      }
+
+      expect(error).toEqual("Icon eye cannot be null or undefined");
+    })
+    test("Getting a bill data", () => {
       const doc = {
         data: function() {
           return {
@@ -88,15 +111,13 @@ describe("Given I am connected as an employee", () => {
         }
       };
 
-      const billData = bill.getBill(doc);
+      const billData = getBill(doc);
 
       expect(billData.date).toEqual("2001-01-01");
       expect(billData.formatedDate).toEqual("1 Jan. 01");
       expect(billData.status).toEqual("En attente");
     })
     test("Getting a incorrect date bill data", () => {
-      const bill = new Bills({document, undefined, undefined, localStorage});
-
       const doc = {
         data: function() {
           return {
@@ -106,15 +127,13 @@ describe("Given I am connected as an employee", () => {
         }
       };
 
-      const billData = bill.getBill(doc);
+      const billData = getBill(doc);
 
       expect(billData.date).toEqual("200000-01-01");
       expect(billData.formatedDate).toEqual(undefined);
       expect(billData.status).toEqual("pending");
     })
     test("Getting a incorrect status bill data", () => {
-      const bill = new Bills({document, undefined, undefined, localStorage});
-
       const doc = {
         data: function() {
           return {
@@ -124,7 +143,7 @@ describe("Given I am connected as an employee", () => {
         }
       };
 
-      const billData = bill.getBill(doc);
+      const billData = getBill(doc);
 
       expect(billData.date).toEqual("2000-01-01");
       expect(billData.formatedDate).toEqual(undefined);
@@ -141,8 +160,7 @@ describe("Given I am a user connected as Employee", () => {
 
       localStorage.setItem("user", `{"type":"Employee","email":"noobnoob@yopmail.com","password":"1234","status":"connected"}`);
 
-      const bill = new Bills({document, undefined, firestore: firebase, localStorage});
-      const bills = await bill.getBills();
+      const bills = await getBills(firebase);
 
       expect(getSpy).toHaveBeenCalledTimes(1);
       expect(bills.length).toBe(1);
@@ -158,10 +176,21 @@ describe("Given I am a user connected as Employee", () => {
 
       localStorage.setItem("user", `{"type":"Employee","email":"noobnoob@yopmail.com","password":"1234","status":"connected"}`);
 
-      const bill = new Bills({document, undefined, firestore: firebase, localStorage});
-      const error = await bill.getBills();
+      const error = await getBills(firebase);
 
       expect(error.message).toEqual("Erreur 404");
+    })
+    test("fetches bills from an undefined API", async () => {
+      let error;
+      localStorage.removeItem("user");
+
+      try {
+        getBills(null);
+      } catch (err) {
+        error = err.message;
+      }
+
+      expect(error).toEqual("Firestore cannot be null or undefined");
     })
   })
 })
