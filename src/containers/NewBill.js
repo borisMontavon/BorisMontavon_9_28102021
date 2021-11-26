@@ -1,6 +1,6 @@
-
-import { ROUTES_PATH } from '../constants/routes.js'
-import Logout from "./Logout.js"
+import { ROUTES_PATH } from "../constants/routes.js";
+import { createBill } from "./FirestoreCaller.js";
+import Logout from "./Logout.js";
 
 export default class NewBill {
   constructor({ document, onNavigate, firestore, localStorage }) {
@@ -12,12 +12,16 @@ export default class NewBill {
     
     if (formNewBill) {
       formNewBill.addEventListener("submit", this.handleSubmit);
+    } else {
+      throw new Error("Form new bill cannot be null or undefined");
     }
     
     const file = this.document.querySelector(`input[data-testid="file"]`);
     
     if (file) {
       file.addEventListener("change", this.handleChangeFile);
+    } else {
+      throw new Error("File cannot be null or undefined");
     }
     
     this.fileUrl = null;
@@ -78,15 +82,8 @@ export default class NewBill {
       status: 'pending'
     };
 
-    await this.createBill(bill);
-  }
-
-  // not need to cover this function by tests
-  createBill = (bill) => {
-    if (this.firestore) {
-      return this.firestore.bills().add(bill).then(() => {
-        this.onNavigate(ROUTES_PATH['Bills'])
-      }).catch(error => error)
-    }
+    createBill(this.firestore, bill).then(() => {
+      this.onNavigate(ROUTES_PATH['Bills']);
+    })
   }
 }

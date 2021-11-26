@@ -1,5 +1,4 @@
 import { ROUTES_PATH } from '../constants/routes.js'
-import { formatDate, formatStatus } from "../app/format.js"
 import Logout from "./Logout.js"
 
 export default class {
@@ -12,14 +11,18 @@ export default class {
 
     if (buttonNewBill) {
       buttonNewBill.addEventListener('click', this.handleClickNewBill);
+    } else {
+      throw new Error("Button new bill cannot be null or undefined");
     }
     
     const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`);
 
-    if (iconEye) {
+    if (iconEye && iconEye.length > 0) {
       iconEye.forEach(icon => {
         icon.addEventListener('click', (e) => this.handleClickIconEye(icon))
       });
+    } else {
+      throw new Error("Icon eye cannot be null or undefined");
     }
 
     new Logout({ document, localStorage, onNavigate });
@@ -34,45 +37,5 @@ export default class {
     
     $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;'><img src=${billUrl} /></div>`);
     $('#modaleFile').modal('show');
-  }
-
-  // not need to cover this function by tests
-  getBills = () => {
-    const userEmail = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).email : "";
-
-    if (this.firestore) {
-      return this.firestore.bills().get().then(snapshot => {
-        const bills = snapshot.docs.map(doc => this.getBill(doc)).filter(bill => bill.email === userEmail);
-
-        return bills;
-      }).catch(error => error)
-    }
-  }
-
-  getBill = (doc) => {
-    const date = doc.data().date;
-
-    try {
-      const validDate = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
-
-      if (validDate.test(date)) {
-        return {
-          ...doc.data(),
-          date: date,
-          formatedDate: formatDate(date),
-          status: formatStatus(doc.data().status)
-        };
-      }
-    } catch(e) {
-      // if for some reason, corrupted data was introduced, we manage here failing formatDate function
-      // log the error and return unformatted date in that case
-      console.log(e,'for', doc.data());
-    }
-
-    return {
-      ...doc.data(),
-      date: date,
-      status: doc.data().status
-    };
   }
 }

@@ -1,7 +1,7 @@
-import { screen } from "@testing-library/dom";
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 import firebase from "../__mocks__/firebase";
+import { createBill } from "../containers/FirestoreCaller";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
@@ -41,41 +41,41 @@ describe("Given I am connected as an employee", () => {
 
       formNewBill.submit();
     })
-  })
-})
+    test("HTML without Form new bill", () => {
+      let error = "";
+      document.body.innerHTML = '';
 
-// test d'intégration GET
-describe("Given I am a user connected as Employee", () => {
-  describe("When I navigate to Bills page", () => {
-    describe("When I navigate to New Bill page", () => {
-      test("create bill from mock API POST", async () => {
-        const getSpy = jest.spyOn(firebase, "bills");
+      try {
+        new NewBill({document, undefined, undefined, undefined});
+      } catch (err) {
+        error = err.message;
+      }
 
-        let currentPage = "";
-        let onNavigate = function(path) {
-          currentPage = path;
-        };
-  
-        const newBill = new NewBill({document, onNavigate, firestore: firebase, undefined});
-        await newBill.createBill("");
-  
-        expect(getSpy).toHaveBeenCalledTimes(1);
-        expect(currentPage).toEqual("#employee/bills");
-      })
-      test("create bill from an API and fails with 404 message error", async () => {
-        firebase.bills.mockImplementationOnce(() => {
-          return {
-            add: function() {
-              return Promise.reject(new Error("Erreur 404"));
-            }
-          }
-        })
-  
-        const newBill = new NewBill({document, undefined, firestore: firebase, undefined});
-        const error = await newBill.createBill("");
-  
-        expect(error.message).toEqual("Erreur 404");
-      })
+      expect(error).toEqual("Form new bill cannot be null or undefined");
+    })
+    test("HTML without File input", () => {
+      let error = "";
+      document.body.innerHTML = '<form data-testid="form-new-bill"></form>';
+
+      try {
+        new NewBill({document, undefined, undefined, undefined});
+      } catch (err) {
+        error = err.message;
+      }
+
+      expect(error).toEqual("File cannot be null or undefined");
+    })
+
+    test("create bill from an API and fails with 404 message error", async () => {
+      const error = await createBill(firebase, "reject");
+
+      expect(error.message).toEqual("Erreur 404");
+    })
+
+    test("create bill with undefined firestore", async () => {
+      const bill = await createBill(undefined, "");
+
+      expect(bill).toBeNull();
     })
   })
 })

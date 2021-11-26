@@ -1,4 +1,5 @@
 import { ROUTES_PATH } from '../constants/routes.js'
+import { checkIfUserExists, createUser } from './FirestoreCaller.js';
 export let PREVIOUS_LOCATION = ''
 
 // we use a class so as to test its methods in e2e tests
@@ -26,21 +27,27 @@ export default class Login {
     };
 
     this.localStorage.setItem("user", JSON.stringify(user));
-    
-    const userExists = this.checkIfUserExists(user);
-
-    if (!userExists) {
-        this.createUser(user);
-    }
 
     e.preventDefault();
     
-    this.onNavigate(ROUTES_PATH['Bills']);
-    this.PREVIOUS_LOCATION = ROUTES_PATH['Bills'];
-    
-    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION;
-    
-    this.document.body.style.backgroundColor="#fff";
+    checkIfUserExists(this.firestore, user).then(userExists => {
+      try {
+        if (!userExists) {
+          createUser(this.firestore, user);
+        } else {
+          throw new Error("User already exists");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+  
+      this.onNavigate(ROUTES_PATH['Bills']);
+      this.PREVIOUS_LOCATION = ROUTES_PATH['Bills'];
+      
+      PREVIOUS_LOCATION = this.PREVIOUS_LOCATION;
+      
+      document.body.style.backgroundColor="#fff";
+    })
   }
 
   handleSubmitAdmin = (e) => {
@@ -52,49 +59,63 @@ export default class Login {
     };
 
     this.localStorage.setItem("user", JSON.stringify(user));
-    
-    const userExists = this.checkIfUserExists(user);
-
-    if (!userExists) {
-        this.createUser(user);
-    }
 
     e.preventDefault();
-    this.onNavigate(ROUTES_PATH['Dashboard']);
-    this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard'];
-
-    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION;
     
-    document.body.style.backgroundColor="#fff";
-  }
-
-  // not need to cover this function by tests
-  checkIfUserExists = (user) => {
-    if (this.firestore) {
-      this.firestore.user(user.email).get().then((doc) => {
-        if (doc.exists) {
-          console.log(`User with ${user.email} exists`);
-
-          return true;
+    checkIfUserExists(this.firestore, user).then(userExists => {
+      try {
+        if (!userExists) {
+          createUser(this.firestore, user);
         } else {
-          return false;
+          throw new Error("User already exists");
         }
-      }).catch(error => error);
-    } else {
-      return null;
-    }
+      } catch (err) {
+        console.error(err);
+      }
+  
+      this.onNavigate(ROUTES_PATH['Dashboard']);
+      this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard'];
+  
+      PREVIOUS_LOCATION = this.PREVIOUS_LOCATION;
+      
+      document.body.style.backgroundColor="#fff";
+    })
   }
 
-  // not need to cover this function by tests
-  createUser = (user) => {
-    if (this.firestore) {
-      this.firestore.users().doc(user.email).set({
-        type: user.type,
-        name: user.email.split('@')[0] 
-      }).then(() => console.log(`User with ${user.email} is created`))
-      .catch(error => error);
-    } else {
-      return null;
-    }
-  }
+  // // not need to cover this function by tests
+  // checkIfUserExists = async (user) => {
+  //   let userExists = true;
+
+  //   if (this.firestore) {
+  //     const doc = await this.firestore.user(user.email).get();
+
+  //     if (doc.exists) {
+  //       console.log(`User with ${user.email} exists`);
+  //     } else {
+  //       userExists = false;
+  //     }
+
+  //     return userExists;
+  //   } else {
+  //     return null;
+  //   }
+  // }
+
+  // // not need to cover this function by tests
+  // createUser = async (user) => {
+  //   if (this.firestore) {
+  //     try {
+  //       await this.firestore.users().doc(user.email).set({
+  //         type: user.type,
+  //         name: user.email.split('@')[0] 
+  //       });
+
+  //       console.log(`User with ${user.email} is created`)
+  //     } catch (err) {
+  //       return err;
+  //     }
+  //   } else {
+  //     return null;
+  //   }
+  // }
 }

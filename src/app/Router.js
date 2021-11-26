@@ -6,6 +6,7 @@ import Dashboard from "../containers/Dashboard.js"
 import BillsUI from "../views/BillsUI.js"
 import DashboardUI from "../views/DashboardUI.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
+import { getBills, getBillsAllUsers } from "../containers/FirestoreCaller.js"
 
 export default () => {
   const rootDiv = document.getElementById('root');
@@ -34,9 +35,7 @@ export default () => {
       divIcon1.classList.add('active-icon');
       divIcon2.classList.remove('active-icon');
 
-      const bills = new Bills({ document, onNavigate, firestore, localStorage  });
-
-      bills.getBills().then(data => {
+      getBills(firestore).then(data => {
         rootDiv.innerHTML = BillsUI({ data });
 
         const divIcon1 = document.getElementById('layout-icon1');
@@ -45,7 +44,11 @@ export default () => {
         divIcon1.classList.add('active-icon');
         divIcon2.classList.remove('active-icon');
 
-        new Bills({ document, onNavigate, firestore, localStorage });
+        try {
+          new Bills({ document, onNavigate, firestore, localStorage });
+        } catch (error) {
+          rootDiv.innerHTML = ROUTES({ pathname, error });
+        }
       }).catch(error => {
         rootDiv.innerHTML = ROUTES({ pathname, error });
       });
@@ -63,9 +66,9 @@ export default () => {
     else if (pathname === ROUTES_PATH['Dashboard']) {
       rootDiv.innerHTML = ROUTES({ pathname, loading: true });
       
-      const bills = new Dashboard({ document, onNavigate, firestore, bills: [], localStorage });
+      // const bills = new Dashboard({ document, onNavigate, firestore, bills: [], localStorage });
       
-      bills.getBillsAllUsers().then(bills => {
+      getBillsAllUsers(firestore).then(bills => {
         rootDiv.innerHTML = DashboardUI({ data: { bills } });
         new Dashboard({ document, onNavigate, firestore, bills, localStorage });
       }).catch(error => {
@@ -97,10 +100,8 @@ export default () => {
 
       divIcon1.classList.add('active-icon');
       divIcon2.classList.remove('active-icon;');
-
-      const bills = new Bills({ document, onNavigate, firestore, localStorage  })
-      
-      bills.getBills().then(data => {
+    
+      getBills(firestore).then(data => {
         rootDiv.innerHTML = BillsUI({ data });
 
         const divIcon1 = document.getElementById('layout-icon1');
@@ -109,7 +110,11 @@ export default () => {
         divIcon1.classList.add('active-icon');
         divIcon2.classList.remove('active-icon');
 
-        new Bills({ document, onNavigate, firestore, localStorage });
+        try {
+          new Bills({ document, onNavigate, firestore, localStorage });
+        } catch (error) {
+          rootDiv.innerHTML = ROUTES({ pathname: window.location.hash, error });
+        }
       }).catch(error => {
         rootDiv.innerHTML = ROUTES({ pathname: window.location.hash, error });
       });
@@ -126,9 +131,9 @@ export default () => {
     } else if (window.location.hash === ROUTES_PATH['Dashboard']) {
       rootDiv.innerHTML = ROUTES({ pathname: window.location.hash, loading: true });
 
-      const bills = new Dashboard({ document, onNavigate, firestore, bills: [], localStorage });
+      // const bills = new Dashboard({ document, onNavigate, firestore, bills: [], localStorage });
 
-      bills.getBillsAllUsers().then(bills => {
+      getBillsAllUsers(firestore).then(bills => {
         rootDiv.innerHTML = DashboardUI({ data: { bills } });
         new Dashboard({ document, onNavigate, firestore, bills, localStorage });
       }).catch(error => {
