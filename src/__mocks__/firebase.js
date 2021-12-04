@@ -1,3 +1,5 @@
+// Mocking of the Firestore component (called in containers/FirestoreCaller.js)
+
 export default {
   get: () => {
     return Promise.resolve({
@@ -157,6 +159,7 @@ export default {
   }
 }
 
+// Manual condition to reject a Promise instead of resolving it
 const checkRejectBill = (bill) => {
   return bill === "reject";
 }

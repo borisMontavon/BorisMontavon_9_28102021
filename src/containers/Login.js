@@ -81,41 +81,4 @@ export default class Login {
       document.body.style.backgroundColor="#fff";
     })
   }
-
-  // // not need to cover this function by tests
-  // checkIfUserExists = async (user) => {
-  //   let userExists = true;
-
-  //   if (this.firestore) {
-  //     const doc = await this.firestore.user(user.email).get();
-
-  //     if (doc.exists) {
-  //       console.log(`User with ${user.email} exists`);
-  //     } else {
-  //       userExists = false;
-  //     }
-
-  //     return userExists;
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // // not need to cover this function by tests
-  // createUser = async (user) => {
-  //   if (this.firestore) {
-  //     try {
-  //       await this.firestore.users().doc(user.email).set({
-  //         type: user.type,
-  //         name: user.email.split('@')[0] 
-  //       });
-
-  //       console.log(`User with ${user.email} is created`)
-  //     } catch (err) {
-  //       return err;
-  //     }
-  //   } else {
-  //     return null;
-  //   }
-  // }
 }

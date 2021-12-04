@@ -79,6 +79,7 @@ export default class {
     this.document = document;
     this.onNavigate = onNavigate;
     this.firestore = firestore;
+    // We keep the state of which card is open
     this.displayedGroupOfTickets = [false, false, false];
 
     $('#arrow-icon1').on("click", ((e) => this.handleShowTickets(e, bills, 1)));
@@ -107,9 +108,12 @@ export default class {
       this.index = index;
     }
 
+    // If the ticket group is not displayed, we display it 
     if (!this.displayedGroupOfTickets[this.index - 1]) {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'});
       $(`#status-bills-container${this.index}`).html(cards(orderBills(filteredBills(bills, getStatus(this.index))), this.id));
+
+      // We update the ticket group displayed state
       this.displayedGroupOfTickets[this.index - 1] = true;
 
       filteredBills(bills, getStatus(this.index)).forEach((bill) => {
@@ -118,6 +122,8 @@ export default class {
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'});
       $(`#status-bills-container${this.index}`).html("");
+
+      // We update the ticket group displayed state
       this.displayedGroupOfTickets[this.index - 1] = false;
     }
   }
@@ -131,6 +137,7 @@ export default class {
       this.id = bill.id;
     }
 
+    // We display a ticket
     if (this.displayTicket) {
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' });
@@ -139,17 +146,22 @@ export default class {
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' });
       $('.dashboard-right-container div').html(DashboardFormUI(bill));
       $('.vertical-navbar').css({ height: '150vh' });
+
+      // For future action : if we click on the same ticket (ticket currently displayed), we close the ticket
       this.displayTicket = false;
 
       $('#icon-eye-d').on("click", (this.handleClickIconEye));
       $('#btn-accept-bill').on("click", (e) => this.handleAcceptSubmit(e, bill));
       $('#btn-refuse-bill').on("click", (e) => this.handleRefuseSubmit(e, bill));
     } else {
+      // We close the ticket if bill.id is the same as the one currently displayed
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' });
       $('.dashboard-right-container div').html(`
         <div id="big-billed-icon"> ${BigBilledIcon} </div>
       `);
       $('.vertical-navbar').css({ height: '120vh' });
+
+      // If displayticket is false, the next action on click will be to display a ticket
       this.displayTicket = true;
       this.id = undefined;
     }
